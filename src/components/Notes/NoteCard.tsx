@@ -1,8 +1,7 @@
-import React from "react";
-import { Tag } from "../modals/types";
+import { Tag } from "application/modals/types";
 import { Badge, Card, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import styles from "./NotesList.module.css";
+import styles from "components/Notes/NotesList.module.css";
 
 type NoteCardProps = {
   id: string;

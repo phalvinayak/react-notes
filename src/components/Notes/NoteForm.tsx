@@ -2,24 +2,29 @@ import { FormEvent, useRef, useState } from "react";
 import { Form, Stack, Row, Col, Button } from "react-bootstrap";
 import CreatableReactSelect from "react-select/creatable";
 import { MultiValue } from "react-select/dist/declarations/src";
-import { v4 as uuidV4 } from "uuid";
 import { Link, useNavigate } from "react-router-dom";
-import { NoteData, ReactSelectType, Tag } from "../modals/types";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  NoteData,
+  RawNoteData,
+  ReactSelectType,
+  Tag,
+} from "application/modals/types";
+import { addNote, updateNote } from "application/redux/slice/noteSlice";
+import { createNewTag } from "application/redux/slice/tagSlice";
+import { ThunkDispatch } from "redux-thunk";
+import { AnyAction } from "redux";
+import { RootState } from "application/redux/store";
+import useNote from "hooks/useNote";
 
-type NoteFormProps = {
-  onSubmit: (data: NoteData) => void;
-  onAddTag: (data: Tag) => void;
-  availableTags: Tag[];
-} & Partial<NoteData>;
+type NoteFormProps = Partial<NoteData>;
 
-const NoteForm = ({
-  onSubmit,
-  onAddTag,
-  availableTags,
-  title = "",
-  body = "",
-  tags = [],
-}: NoteFormProps) => {
+const NoteForm = ({ title = "", body = "", tags = [] }: NoteFormProps) => {
+  const note = useNote();
+  const dispatch = useDispatch();
+  const thunkDispatch = useDispatch<ThunkDispatch<string, void, AnyAction>>();
+  const availableTags = useSelector((store: RootState) => store.tag.tags);
+
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const [selectedTags, setSeletedTags] = useState<Tag[]>(tags);
@@ -27,12 +32,21 @@ const NoteForm = ({
 
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
-    onSubmit({
+    const noteData: RawNoteData = {
       title: titleRef.current!.value,
       body: bodyRef.current!.value,
-      tags: selectedTags,
-    });
-
+      tagIds: selectedTags.map((tag) => tag.id),
+    };
+    if (note) {
+      dispatch(
+        updateNote({
+          id: note.id,
+          ...noteData,
+        })
+      );
+    } else {
+      dispatch(addNote(noteData));
+    }
     navigate("..");
   };
 
@@ -50,9 +64,9 @@ const NoteForm = ({
     );
   };
 
-  const onCreateNewTag = (label: string): void => {
-    const newTag: Tag = { id: uuidV4(), label };
-    onAddTag(newTag);
+  const onCreateNewTag = async (label: string): Promise<void> => {
+    const newTag = await thunkDispatch(createNewTag(label)).unwrap();
+    console.log(newTag);
     setSeletedTags((prevTags) => [...prevTags, newTag]);
   };
 

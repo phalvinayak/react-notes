@@ -2,24 +2,18 @@ import { useState, useMemo, ChangeEvent } from "react";
 import { Form, Button, Col, Row, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ReactSelect from "react-select";
+import { useSelector } from "react-redux";
 import { MultiValue } from "react-select/dist/declarations/src";
-import { Note, ReactSelectType, Tag } from "../modals/types";
-import NoteCard from "./NoteCard";
-import EditTagsModal from "./Tags/EditTagsModal";
+import { ReactSelectType, Tag } from "application/modals/types";
+import NoteCard from "components/Notes/NoteCard";
+import EditTagsModal from "components/Tags/EditTagsModal";
+import { RootState } from "application/redux/store";
+import { useNotesWithTags } from "hooks/useNotesWithTags";
 
-type NoteListProps = {
-  availableTags: Tag[];
-  notes: Note[];
-  updateTag: (id: string, label: string) => void;
-  deleteTag: (id: string) => void;
-};
+const NoteList = () => {
+  const notes = useNotesWithTags();
+  const tags = useSelector((store: RootState) => store.tag.tags);
 
-const NoteList = ({
-  availableTags,
-  notes,
-  updateTag,
-  deleteTag,
-}: NoteListProps) => {
   const [selectedTags, setSeletedTags] = useState<Tag[]>([]);
   const [title, setTitle] = useState<string>("");
   const [showEditTagModal, setShowEditTagModal] = useState(false);
@@ -48,7 +42,7 @@ const NoteList = ({
         )
       );
     });
-  }, [title, selectedTags, notes]);
+  }, [notes, title, selectedTags]);
 
   const toggleModal = () => {
     setShowEditTagModal(!showEditTagModal);
@@ -91,7 +85,7 @@ const NoteList = ({
               <ReactSelect
                 value={tagsValue}
                 onChange={onTagsChangeHandler}
-                options={availableTags.map((tag) => {
+                options={tags.map((tag) => {
                   return { label: tag.label, value: tag.id };
                 })}
                 isMulti
@@ -107,13 +101,7 @@ const NoteList = ({
           </Col>
         ))}
       </Row>
-      <EditTagsModal
-        availableTags={availableTags}
-        show={showEditTagModal}
-        toggleModal={toggleModal}
-        updateTag={updateTag}
-        deleteTag={deleteTag}
-      />
+      <EditTagsModal show={showEditTagModal} toggleModal={toggleModal} />
     </>
   );
 };

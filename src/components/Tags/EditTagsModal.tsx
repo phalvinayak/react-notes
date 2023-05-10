@@ -1,22 +1,15 @@
 import { Form, Modal, Row, Stack } from "react-bootstrap";
-import { Tag } from "../../modals/types";
-import SingleTag from "./SingleTag";
+import SingleTag from "components/Tags/SingleTag";
+import { useSelector } from "react-redux";
+import { RootState } from "application/redux/store";
 
 type EditTagsModalProps = {
-  availableTags: Tag[];
   show: boolean;
   toggleModal: () => void;
-  updateTag: (id: string, label: string) => void;
-  deleteTag: (id: string) => void;
 };
 
-const EditTagsModal = ({
-  availableTags,
-  show,
-  toggleModal,
-  updateTag,
-  deleteTag,
-}: EditTagsModalProps) => {
+const EditTagsModal = ({ show, toggleModal }: EditTagsModalProps) => {
+  const tags = useSelector((store: RootState) => store.tag.tags);
   return (
     <Modal show={show} onHide={toggleModal}>
       <Modal.Header closeButton>
@@ -25,15 +18,9 @@ const EditTagsModal = ({
       <Modal.Body>
         <Form>
           <Stack gap={2}>
-            {availableTags.map((tag) => (
+            {tags.map((tag) => (
               <Row key={tag.id}>
-                <SingleTag
-                  id={tag.id}
-                  label={tag.label}
-                  updateTag={updateTag}
-                  deleteTag={deleteTag}
-                  toggleModal={toggleModal}
-                />
+                <SingleTag id={tag.id} label={tag.label} />
               </Row>
             ))}
           </Stack>

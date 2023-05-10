@@ -1,21 +1,21 @@
 import { useCallback } from "react";
-import useNote from "../hooks/useNote";
+import useNote from "hooks/useNote";
 import { Badge, Button, Col, Row, Stack } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { ReactMarkdown } from "react-markdown/lib/react-markdown";
+import { useDispatch } from "react-redux";
+import { deleteNote } from "application/redux/slice/noteSlice";
 
-type SingleNoteProps = {
-  onDelete: (id: string) => void;
-};
-
-const SingleNote = ({ onDelete }: SingleNoteProps) => {
+const SingleNote = () => {
   const note = useNote();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  console.log("Single note", note);
   const onDeleteClickHandler = useCallback(() => {
-    onDelete(note.id);
+    dispatch(deleteNote(note.id));
     navigate("/");
-  }, [note.id, navigate]);
+  }, [note.id, navigate, dispatch]);
 
   return (
     <>
