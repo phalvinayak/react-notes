@@ -67,13 +67,8 @@ const NoteForm = ({ title = "", body = "", tags = [] }: NoteFormProps) => {
 
   const onCreateNewTag = async (label: string): Promise<void> => {
     const newTag = await thunkDispatch(createNewTag(label)).unwrap();
-    console.log(newTag);
     setSeletedTags((prevTags) => [...prevTags, newTag]);
   };
-
-  // const handleEditorChange = ({ text }: { text: string }) => {
-  //   setValue(text);
-  // };
 
   const handleEditorChange = (
     value?: string,
