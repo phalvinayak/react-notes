@@ -9,6 +9,7 @@ import NoteCard from "components/Notes/NoteCard";
 import EditTagsModal from "components/Tags/EditTagsModal";
 import { RootState } from "application/redux/store";
 import { useNotesWithTags } from "hooks/useNotesWithTags";
+import NotesLogo from "assets/img/logo192.png";
 
 const NoteList = () => {
   const notes = useNotesWithTags();
@@ -52,7 +53,10 @@ const NoteList = () => {
     <>
       <Row className="align-items-center mb-4">
         <Col>
-          <h1>Notes</h1>
+          <h1>
+            <img src={NotesLogo} alt="notes logo" height={35} />
+            Notes
+          </h1>
         </Col>
         <Col xs="auto">
           <Stack gap={2} direction="horizontal">
