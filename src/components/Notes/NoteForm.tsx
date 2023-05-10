@@ -3,7 +3,10 @@ import { Form, Stack, Row, Col, Button } from "react-bootstrap";
 import CreatableReactSelect from "react-select/creatable";
 import { MultiValue } from "react-select/dist/declarations/src";
 import { Link, useNavigate } from "react-router-dom";
+import { AnyAction } from "redux";
 import { useDispatch, useSelector } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
+import Editor, { ContextStore } from "@uiw/react-md-editor";
 import {
   NoteData,
   RawNoteData,
@@ -12,21 +15,19 @@ import {
 } from "application/modals/types";
 import { addNote, updateNote } from "application/redux/slice/noteSlice";
 import { createNewTag } from "application/redux/slice/tagSlice";
-import { ThunkDispatch } from "redux-thunk";
-import { AnyAction } from "redux";
 import { RootState } from "application/redux/store";
 import useNote from "hooks/useNote";
 
 type NoteFormProps = Partial<NoteData>;
 
 const NoteForm = ({ title = "", body = "", tags = [] }: NoteFormProps) => {
+  const [markdown, setMarkdown] = useState<string>(body);
   const note = useNote();
   const dispatch = useDispatch();
   const thunkDispatch = useDispatch<ThunkDispatch<string, void, AnyAction>>();
   const availableTags = useSelector((store: RootState) => store.tag.tags);
 
   const titleRef = useRef<HTMLInputElement>(null);
-  const bodyRef = useRef<HTMLTextAreaElement>(null);
   const [selectedTags, setSeletedTags] = useState<Tag[]>(tags);
   const navigate = useNavigate();
 
@@ -34,7 +35,7 @@ const NoteForm = ({ title = "", body = "", tags = [] }: NoteFormProps) => {
     e.preventDefault();
     const noteData: RawNoteData = {
       title: titleRef.current!.value,
-      body: bodyRef.current!.value,
+      body: markdown,
       tagIds: selectedTags.map((tag) => tag.id),
     };
     if (note) {
@@ -70,6 +71,18 @@ const NoteForm = ({ title = "", body = "", tags = [] }: NoteFormProps) => {
     setSeletedTags((prevTags) => [...prevTags, newTag]);
   };
 
+  // const handleEditorChange = ({ text }: { text: string }) => {
+  //   setValue(text);
+  // };
+
+  const handleEditorChange = (
+    value?: string,
+    _event?: React.ChangeEvent<HTMLTextAreaElement>,
+    _state?: ContextStore
+  ) => {
+    setMarkdown(value || "");
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <Stack gap={4}>
@@ -97,13 +110,13 @@ const NoteForm = ({ title = "", body = "", tags = [] }: NoteFormProps) => {
         </Row>
         <Form.Group controlId="body">
           <Form.Label>Body</Form.Label>
-          <Form.Control
-            ref={bodyRef}
-            required
-            as="textarea"
-            rows={15}
-            defaultValue={body}
-          />
+          <div data-color-mode="light">
+            <Editor
+              height={400}
+              value={markdown}
+              onChange={handleEditorChange}
+            />
+          </div>
         </Form.Group>
         <Stack direction="horizontal" gap={2} className="justify-content-end">
           <Button type="submit" variant="primary">

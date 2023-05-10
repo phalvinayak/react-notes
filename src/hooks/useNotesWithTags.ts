@@ -4,8 +4,10 @@ import { RootState } from "application/redux/store";
 import { useSelector } from "react-redux";
 
 export function useNotesWithTags(): Note[] {
-  const notes = useSelector((store: RootState) => store.note.notes);
-  const tags = useSelector((store: RootState) => store.tag.tags);
+  const { notes, tags } = useSelector((store: RootState) => ({
+    notes: store.note.notes,
+    tags: store.tag.tags,
+  }));
   const notesWithTags: Note[] = useMemo(() => {
     return notes.map((note) => {
       return {

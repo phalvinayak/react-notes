@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import useNote from "hooks/useNote";
 import { Badge, Button, Col, Row, Stack } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { ReactMarkdown } from "react-markdown/lib/react-markdown";
+import MDEditor from "@uiw/react-md-editor";
 import { useDispatch } from "react-redux";
 import { deleteNote } from "application/redux/slice/noteSlice";
 
@@ -46,7 +46,9 @@ const SingleNote = () => {
           </Stack>
         </Col>
       </Row>
-      <ReactMarkdown>{note.body}</ReactMarkdown>
+      <div data-color-mode="light">
+        <MDEditor.Markdown source={note.body} />
+      </div>
     </>
   );
 };
